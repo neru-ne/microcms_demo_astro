@@ -1,0 +1,54 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import MainContents from "@/components/layouts/MainContents.astro";
+import ArchiveListSingle from "@/components/atoms/ArchiveListSingle.astro";
+import PageNavi from '@/components/atoms/navi/PageNavi.astro';
+
+import { getItemList } from "@/library/microcms";
+import type {pageNaviType} from '@/types/components'
+
+
+const response = await getItemList({
+  limit: import.meta.env.ITEM_PER_PAGE,
+  offset:0,
+  fields: ["id", "name", "category", "kinds", "price"],
+});
+
+
+const naviData :pageNaviType = {
+  url:"/item",
+  itemList: {
+    data: response.contents,
+    start: 0,
+    end: 0,
+    size: 0,
+    total: Number(response.totalCount),
+    currentPage: 1,
+    lastPage: 0,
+    url: {
+      current: "",
+      next: "",
+      prev: "",
+    },
+  },
+}
+---
+
+<Layout title="商品一覧ページ" description="商品一覧ページのdescription">
+  <main>
+    <MainContents>
+      <ul class="grid gap-4 grid-cols-3">
+        {
+          response.contents.map((content: any) => (
+            <ArchiveListSingle {...content} />
+          ))
+        }
+      </ul>
+      {
+        response && (
+      <PageNavi  {...naviData} />
+      )
+      }
+    </MainContents>
+  </main>
+</Layout>

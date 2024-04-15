@@ -1,0 +1,102 @@
+---
+import { parse } from 'node-html-parser';
+import Layout from "@/layouts/Layout.astro";
+import MainContents from "@/components/layouts/MainContents.astro";
+
+//components
+import CommonButton from "@/components/atoms/button/CommonButton.astro";
+import CategoryList from "@/components/atoms/list/CategoryList.astro";
+import TagList from "@/components/atoms/list/TagList.astro";
+import ItemSlideshow from "@/components/atoms/slideshow/ItemSlideshow.astro";
+import CustomerList from '@/components/molecules/CustomerList.astro';
+import RepeatContents from '@/components/molecules/RepeatContents.astro';
+
+import type {commonButtonType} from '@/types/components'
+
+import { getItemList,getItem } from "@/library/microcms";
+
+// 詳細記事ページの全パスを取得
+export async function getStaticPaths() {
+  const response = await getItemList({ fields: ["id"] });
+  return response.contents.map((content: any) => ({
+    params: {
+      blogId: content.id,
+    },
+  }));
+}
+
+//記事の詳細情報を取得
+const { blogId } = Astro.params;
+const item = await getItem(blogId as string);
+
+const backButton: commonButtonType = {
+    mode: "link",
+    linkHref: "/item",
+    name: "Itemに戻る",
+    blank: false,
+    kinds:"primary",
+  }
+---
+
+<Layout title={item.name} description={item.default.lead}>
+  <main>
+    <MainContents>
+
+      {
+        item && (
+          <>
+            <CategoryList
+              list={item.category} className="flex flex-wrap gap-2 mb-4" 
+              link={true}
+            />
+            <h1 class="text-2xl font-bold">{item.name}</h1>
+            <div class="flex flex-wrap gap-2 mt-4">
+
+              <TagList
+                list={item.kinds}
+                className="flex flex-wrap gap-2"
+              />
+              <TagList
+                list={item.price}
+                className="flex flex-wrap gap-2"
+              />
+            </div>
+
+
+            <div class='mt-4'>
+              <p class="text-xl font-bold mb-2">{item.default.lead}</p>
+
+              {/* slideshow */}
+              {
+                item.default.img && 0 < item.default.img.length && (
+                  <ItemSlideshow list={item.default.img} className="c-itemSlideshow mb-2" />
+                )
+              }
+              {
+                item.default.contents && (
+                  <div class="">
+                    {parse(item.default.contents)}
+                  </div>
+                )
+              }
+              {/* お客様の声 */}
+              {
+                item.custom && 0 < item.custom.body.length && (
+                  <CustomerList list={item.custom.body} className="mt-8 mb-2"  />
+                )
+              }
+              {/* リピートコンテンツ */}
+              {
+                item.contents && 0 < item.contents.length && (
+                  <RepeatContents data={item.contents}  />
+                )
+              }
+            </div>
+            <div class="w-full flex justify-center mt-20">
+              <CommonButton {...backButton} />
+            </div>
+          </>
+        )
+      }
+  </main>
+</Layout>

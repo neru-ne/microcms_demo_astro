@@ -1,0 +1,50 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import MainContents from "@/components/layouts/MainContents.astro";
+
+import { getItemList } from "@/library/microcms";
+import type { itemListSingleType } from "@/types/api";
+import ArchiveListSingle from "@/components/atoms/ArchiveListSingle.astro";
+import PageNavi from "@/components/atoms/navi/PageNavi.astro";
+
+export async function getStaticPaths({ paginate }: any) {
+  const response = await getItemList({
+    limit: 100,
+    offset: 0,
+    fields: ["id", "name", "category", "kinds", "price"],
+  });
+
+  const list = response.contents;
+
+  return paginate(list, { pageSize: Number(import.meta.env.ITEM_PER_PAGE) });
+}
+// ページネーションされたデータは、すべて"page"プロパティとして渡されます
+interface Props {
+  page: {
+    data: itemListSingleType[];
+    start: number;
+    end: number;
+    size: number;
+    total: number;
+    currentPage: number;
+    lastPage: number;
+    url: {
+      current: string;
+      next: string;
+      prev: string;
+    };
+  };
+}
+const { page } = Astro.props;
+---
+
+<Layout title="商品一覧ページ" description={`いま${page.currentPage}ページ目`}>
+  <main>
+    <MainContents>
+      <ul class="grid gap-4 grid-cols-3">
+        {page.data.map((content: any) => <ArchiveListSingle {...content} />)}
+      </ul>
+      {page && <PageNavi url="/item" itemList={page} />}
+    </MainContents>
+  </main>
+</Layout>

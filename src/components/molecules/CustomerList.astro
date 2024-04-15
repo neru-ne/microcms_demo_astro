@@ -1,0 +1,28 @@
+---
+interface Props {
+  list: {
+    fieldId: string;
+    name: string;
+    contents: string;
+  }[],
+  className: string,
+}
+const { list,className} = Astro.props;
+---
+{
+  0 < list.length && (
+<div class={`${className} flex flex-wrap gap-4`}>
+  {
+    list.map((item) => {
+      return (
+        <div class='rounded-lg border border-slate-500 p-4 w-[calc(100%/3)]'>
+          <p class='font-bold mb-2'>{item.name}</p>
+          <div class='whitespace-pre-wrap'>{item.contents}</div>
+        </div>
+      )
+    })
+  }
+</div>
+)
+}
+

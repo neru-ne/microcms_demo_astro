@@ -1,0 +1,130 @@
+---
+import type { itemListSingleType } from "@/types/api";
+interface Props {
+  url: string;
+  itemList: {
+    data: itemListSingleType[];
+    start: number;
+    end: number;
+    size: number;
+    total: number;
+    currentPage: number;
+    lastPage: number;
+    url: {
+      current: string;
+      next: string;
+      prev: string;
+    };
+  };
+}
+const { url, itemList } = Astro.props;
+
+const PER_PAGE = Number(import.meta.env.ITEM_PER_PAGE); //1ページにおける表示数
+const STEP = 2; //現在のページの前後表示数
+
+const totalCount = Number(itemList.total); //全記事
+const offset = Number(itemList.currentPage); //現在のページ数
+const range = (start: number, end: number) =>
+  [...Array(end - start + 1)].map((_, i) => start + i);
+
+let maxPage = Math.ceil(totalCount / PER_PAGE); //全ページ数
+let firstPage = offset  - STEP; // 表示する最初のページ
+let lastPage = offset + STEP; //表示する最後のページ
+
+let firstFlg = false; //・・・と最初のリンクを表示するかどうか
+let lastFlg = false; //・・・と最後のリンクを表示するかどうか
+
+if (firstPage <= 0) {
+  firstPage = 1;
+  firstFlg = false;
+} else {
+  if (1 < firstPage) {
+    firstFlg = true;
+  } else {
+    firstFlg = false;
+  }
+}
+
+if (maxPage <= lastPage) {
+  lastPage = maxPage;
+  lastFlg = false;
+} else {
+  lastFlg = true;
+}
+---
+
+<>
+  <div class="flex justify-center">
+    <ul class="flex gap-4 mt-1 c-pageNavi text-[#333]">
+      {
+        1 < offset && (
+          <li class="flex bg-white rounded-md shadow-md ">
+            <a
+              href={`${url}/page/${offset - 1}`}
+              class="flex items-center px-3 py-2"
+            >
+              ＜
+            </a>
+          </li>
+        )
+      }
+      {
+        firstFlg && (
+          <>
+            <li class="flex bg-white rounded-md shadow-md">
+              <a href={`${url}/page/1`} class="flex items-center px-3 py-2">
+                1
+              </a>
+            </li>
+            <li class="flex text-white items-center">...</li>
+          </>
+        )
+      }
+      {
+        range(firstPage, lastPage).map((number) => (
+          <li
+            class={`flex bg-white rounded-md shadow-md ${number === offset ? "is-current" : ""}`}
+          >
+            {number === offset ? (
+              <span class="flex items-center px-3 py-2">{number}</span>
+            ) : (
+              <a
+                href={`${url}/page/${number}`}
+                class="flex items-center px-3 py-2"
+              >
+                {number}
+              </a>
+            )}
+          </li>
+        ))
+      }
+      {
+        lastFlg && (
+          <>
+            <li class="flex text-white items-center">...</li>
+            <li class="flex bg-white rounded-md shadow-md">
+              <a
+                href={`${url}/page/${maxPage}`}
+                class="flex items-center px-3 py-2"
+              >
+                {maxPage}
+              </a>
+            </li>
+          </>
+        )
+      }
+      {
+        offset  < maxPage && (
+          <li class="flex bg-white rounded-md shadow-md ">
+            <a
+              href={`${url}/page/${offset + 1}`}
+              class="flex items-center px-3 py-2"
+            >
+              ＞
+            </a>
+          </li>
+        )
+      }
+    </ul>
+  </div>
+</>

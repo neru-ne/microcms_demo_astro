@@ -1,0 +1,42 @@
+---
+interface Props {
+  list:{
+    id: string;
+    name: string;
+    slug: string;
+  }[],
+  className:string,
+  link: boolean,
+}
+
+  const {
+    list,
+    className,
+    link,
+  } = Astro.props;
+  ---
+
+{
+  0 < list.length && (
+      <div class={className}>
+      {
+        list.map((itemCategory) => {
+          return (
+            link ?
+              <a href={`/item/category/${itemCategory.slug}`} class={`bg-primary text-white px-2 py-1 text-[12px] rounded-lg ${itemCategory.slug}`} >
+                {itemCategory.name}
+              </a>
+              :
+              <span class={`bg-primary text-white px-2 py-1 text-[12px] rounded-lg ${itemCategory.slug}`} >
+                {itemCategory.name}
+              </span>
+          )
+
+        })
+      }
+    </div>
+    )
+}
+
+
+

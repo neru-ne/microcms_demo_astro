@@ -1,0 +1,20 @@
+---
+import TagList from "@/components/atoms/list/TagList.astro";
+import CategoryList from "./list/CategoryList.astro";
+const { id, name, category, kinds, price } = Astro.props;
+---
+
+<li
+  class="list-none rounded-xl border-solid bg-[#fbfbfb] shadow-md text-[#333]"
+>
+  <a href={`/item/${id}`} class="p-4 block">
+    <p class="text-lg font-bold mb-2">{name}</p>
+    <CategoryList
+      list={category}
+      className="flex flex-wrap gap-2"
+      link={false}
+    />
+    <TagList list={kinds} className="mt-2 flex flex-wrap gap-2" />
+    <TagList list={price} className="flex flex-wrap gap-2" />
+  </a>
+</li>

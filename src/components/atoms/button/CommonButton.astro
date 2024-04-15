@@ -1,0 +1,30 @@
+---
+interface Props {
+  mode: "button" | "link";
+  linkHref: "" | string;
+  name: string;
+  blank: boolean;
+  kinds: "primary" | "secondary" | "other";
+}
+
+const { mode, linkHref, name, blank, kinds } = Astro.props;
+---
+
+{
+  mode === "button" ? (
+    <button class={`c-button ${kinds}`}>{name}</button>
+  ) : blank ? (
+    <a
+      class={`c-button ${kinds}`}
+      href={linkHref}
+      target="_blank"
+      rel="noopener"
+    >
+      {name}
+    </a>
+  ) : (
+    <a class={`c-button ${kinds}`} href={linkHref} target="">
+      {name}
+    </a>
+  )
+}

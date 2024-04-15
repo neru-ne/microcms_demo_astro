@@ -1,0 +1,49 @@
+---
+import { parse } from "node-html-parser";
+import ItemSlideshow from "@/components/atoms/slideshow/ItemSlideshow.astro";
+
+interface Props {
+  data: {
+    [key: string]: any;
+  }[];
+}
+const { data } = Astro.props;
+
+---
+
+{
+  data.map((item) => {
+    switch (item.fieldId) {
+    case "gallery_col":
+      return (
+        item.gallery &&
+        0 < item.gallery.length && (
+        <div class="mt-4"><ItemSlideshow list={item.gallery} className="c-itemSlideshow mb-2" /></div>
+        )
+      );
+    case "img_single_col":
+      let css = "flex";
+      if (item.layout[0] === "右：画像　左：文章") {
+        css = css + " flex-row-reverse";
+      }
+      return (
+      <div class="mt-4">
+        <div class={css}>
+          <div class="w-[40%]">
+            <img src={item.img.url} alt="" />
+          </div>
+          <div class="whitespace-pre-wrap w-[60%]">{item.contents}</div>
+        </div>
+        </div>
+      );
+    case "free_col":
+      return <div class="mt-4">{parse(item.contents)}</div>;
+    case "img_col":
+      //画像単体
+      return <div class="mt-4"><img src={item.img.url} alt="" /></div>;
+    default:
+      return <>default</>;
+  }
+  })
+}
+
