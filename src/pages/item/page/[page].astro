@@ -2,19 +2,18 @@
 import Layout from "@/layouts/Layout.astro";
 import MainContents from "@/components/layouts/MainContents.astro";
 
-import { getItemList } from "@/library/microcms";
+import { getAllItemList } from "@/library/microcms";
 import type { itemListSingleType } from "@/types/api";
 import ArchiveListSingle from "@/components/atoms/ArchiveListSingle.astro";
 import PageNavi from "@/components/atoms/navi/PageNavi.astro";
 
 export async function getStaticPaths({ paginate }: any) {
-  const response = await getItemList({
-    limit: 100,
+  const response = await getAllItemList({
     offset: 0,
     fields: ["id", "name", "category", "kinds", "price"],
   });
 
-  const list = response.contents;
+  const list = response;
 
   return paginate(list, { pageSize: Number(import.meta.env.ITEM_PER_PAGE) });
 }
