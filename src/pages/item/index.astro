@@ -7,13 +7,15 @@ import PageNavi from '@/components/atoms/navi/PageNavi.astro';
 import { getItemList } from "@/library/microcms";
 import type {pageNaviType} from '@/types/components'
 
+const PER_PAGE = import.meta.env.ITEM_PER_PAGE;
 
 const response = await getItemList({
-  limit: import.meta.env.ITEM_PER_PAGE,
+  limit: PER_PAGE,
   offset:0,
   fields: ["id", "name", "category", "kinds", "price"],
 });
 
+let maxPage = Math.ceil(Number(response.totalCount) / PER_PAGE); //全ページ数
 
 const naviData :pageNaviType = {
   url:"/item",
@@ -21,10 +23,10 @@ const naviData :pageNaviType = {
     data: response.contents,
     start: 0,
     end: 0,
-    size: 0,
-    total: Number(response.totalCount),
+    size: PER_PAGE,
+    total:0,
     currentPage: 1,
-    lastPage: 0,
+    lastPage: maxPage,
     url: {
       current: "",
       next: "",
@@ -32,6 +34,7 @@ const naviData :pageNaviType = {
     },
   },
 }
+console.log(naviData)
 ---
 
 <Layout title="商品一覧ページ" description="商品一覧ページのdescription">
@@ -45,7 +48,7 @@ const naviData :pageNaviType = {
         }
       </ul>
       {
-        response && (
+        naviData && (
       <PageNavi  {...naviData} />
       )
       }

@@ -13,12 +13,12 @@ import RepeatContents from '@/components/molecules/RepeatContents.astro';
 
 import type {commonButtonType} from '@/types/components'
 
-import { getItemList,getItem } from "@/library/microcms";
+import { getAllItemList,getItem } from "@/library/microcms";
 
 // 詳細記事ページの全パスを取得
 export async function getStaticPaths() {
-  const response = await getItemList({ fields: ["id"] });
-  return response.contents.map((content: any) => ({
+  const response = await getAllItemList({ fields: ["id"] });
+  return response.map((content: any) => ({
     params: {
       blogId: content.id,
     },
